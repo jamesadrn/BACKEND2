@@ -25,14 +25,8 @@ async function getUsers() {
 async function getUsersByField(field, value, sortFieldName, sortOrder) {
   let users;
 
-  // Panggil repository untuk mendapatkan pengguna berdasarkan kriteria
-  users = await usersRepository.getUsersByField(field, value);
-
-  // Nilai Default Sort
-  if (!sortFieldName || !sortOrder) {
-    sortFieldName = 'email';
-    sortOrder = 'asc';
-  }
+  // Searching
+  users = await usersRepository.getUsersByField(field, value, sortFieldName, sortOrder);
 
   // Jika ada kriteria pengurutan, lakukan pengurutan
   if (sortFieldName && sortOrder) {
