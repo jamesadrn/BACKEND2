@@ -1,16 +1,14 @@
 // users-repository.js
 const { User } = require('../../../models');
+const { email } = require('../../../models/users-schema');
 
 /**
  * Get a list of users
  * @returns {Promise}
  */
 async function getUsers() {
-  return User.find({});
-}
-
-async function getUsersByField(field, value, sortFieldName, sortOrder) {
-  let query = {};
+    sortFieldName = 'email';
+    sortOrder = 'asc';
 
   // Atur nilai pengurutan jika 'asc' atau 'desc'
   if (value === 'asc') {
@@ -19,21 +17,46 @@ async function getUsersByField(field, value, sortFieldName, sortOrder) {
     value = -1;
   }
 
+  // Pengurutan Default
+  if (sortFieldName && sortOrder) {
+    users = users.sort((a, b) => {
+      if (a[sortFieldName] < b[sortFieldName]) {
+        return sortOrder === 'asc' ? -1 : 1;
+      }
+      if (a[sortFieldName] > b[sortFieldName]) {
+        return sortOrder === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+  }
+  
+  // default query
+  query[email] = value;
+
+  // Panggil user.find dengan query default (email:asc)
+  let users = await User.find(query);
+}
+
+async function getUsersByField(field, value, sortFieldName, sortOrder) {
+  let query = {};
+
+  // Atur nilai pengurutan jika 'asc' atau 'desc'
+  if (sortOrder === 'asc') {
+    sortOrder = 1;
+  } else if (sortOrder === 'desc') {
+    sortOrder = -1;
+  } else {
+    // Jika format salah/tidak ada maka defaultnya asc
+    sortOrder = 1;
+  }
+
   // Validasi field
   if (field === 'name' || field === 'email') {
     query[field] = value;
-  } else {
-    throw new Error('Invalid field');
-  }
+  } else return null;
 
   // Panggil User.find dengan query yang telah dibuat
   let users = await User.find(query);
-
-  // Nilai Default Sort
-  if (!sortFieldName || !sortOrder) {
-    sortFieldName = 'email';
-    sortOrder = 'asc';
-  }
 
   // Jika ada kriteria pengurutan, lakukan pengurutan
   if (sortFieldName && sortOrder) {
