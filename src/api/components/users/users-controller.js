@@ -10,30 +10,16 @@ const { errorResponder, errorTypes } = require('../../../core/errors');
  */
 
 //SEARCHING AND SORTING
-async function getUsers(fieldName, searchKey, sortFieldName, sortOrder) {
+async function getUsers(searchfieldName, searchKey, sortFieldName, sortOrder) {
   let users;
 
   // Jika ada kriteria pencarian, panggil service untuk mendapatkan pengguna berdasarkan kriteria pencarian
-  if (fieldName && searchKey) {
-    users = await usersService.getUsersByField(fieldName, searchKey);
+  if (searchfieldName && searchKey) {
+    users = await usersService.getUsersByField(searchfieldName, searchKey, sortFieldName, sortOrder);
   } else {
-    // Jika tidak ada kriteria pencarian, panggil service untuk mendapatkan semua pengguna
+    // Jika tidak ada kriteria pencarian, panggil service untuk mendapatkan semua pengguna (default sort)
     users = await usersService.getUsers();
   }
-
-  // Jika ada kriteria pengurutan, lakukan pengurutan
-  if (sortFieldName && sortOrder) {
-    users.sort((a, b) => {
-      if (a[sortFieldName] < b[sortFieldName]) {
-        return sortOrder === 'asc' ? -1 : 1;
-      }
-      if (a[sortFieldName] > b[sortFieldName]) {
-        return sortOrder === 'asc' ? 1 : -1;
-      }
-      return 0;
-    });
-  }
-
   return users;
 }
 
